@@ -21,9 +21,9 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
             mainTableData: '',
             baseImagedata: '',
             serverHostedDetails: {
-                url: 'http://localhost:3000/lireq',
-                geturl: 'http://localhost:3000/sessionid',
-                getDefImagesUrl: 'http://localhost:3000/defaultImages',
+                url: 'https://xvisionserver21.azurewebsites.net/lireq',
+                geturl: 'https://xvisionserver21.azurewebsites.net/sessionid',
+                getDefImagesUrl: 'https://xvisionserver21.azurewebsites.net/defaultImages',
                 urlkey: 'urld',
                 imgUrlKey: 'imgurl',
                 cookiesKey: 'sessiondata'
@@ -55,6 +55,8 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
             pluralClasses: ['persons', 'birds', 'cats', 'cows', 'dogs', 'horses', 'sheeps', 'aeroplanes', 'bicycles', 'boats', 'buses', 'cars', 'motorbikes', 'trains', 'bottles', 'chairs', 'dining tables', 'potted plants', 'sofas', 'tv"s/monitors'],
             pageFlag: 'dynastat',
             pageFlagVal: '',
+            hostedflag: 'hosted',
+            hostedflagVal: '',
             imageInd: ''
         };
 
@@ -66,6 +68,9 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 checkCookies();
 
                 pageDetails.pageFlagVal = getQueryString(pageDetails.pageFlag);
+
+                pageDetails.hostedflagVal = getQueryString(pageDetails.hostedflag);
+
 
                 if (pageDetails.pageFlagVal == 'yes') {
 
@@ -329,14 +334,31 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
 
                     //append the image urls
                     for (s3 = 0; s3 < slideData[s1].imageUrls.length; s3++) {
-                        if (s3 == 0) {
-                            slideDivData = slideDivData + '<div class="item active">' +
-                                '<img class="carImgHeight" src="' + slideData[s1].imageUrls[s3] + '" data-indexImg="' + (indexImgCount++) + '"></img>' +
-                                '</div>';
+
+                        //(slideData[s1].imageUrls[s3].split('.')[0]).split('\\')[2] + slideData[s1].imageUrls[s3].split('.')[1]
+
+                        if(pageDetails.hostedflagVal == 'yes'){
+                            var currFileName = (slideData[s1].imageUrls[s3].split('.')[0]).split('\\')[1] + '/' + (slideData[s1].imageUrls[s3].split('.')[0]).split('\\')[2] + '.'  + slideData[s1].imageUrls[s3].split('.')[1];
+                            var currFileUrl = 'Images/Slideimages/' + currFileName;
+                            if (s3 == 0) {
+                                slideDivData = slideDivData + '<div class="item active">' +
+                                    '<img class="carImgHeight" src="' + currFileUrl+ '" data-indexImg="' + (indexImgCount++) + '"></img>' +
+                                    '</div>';
+                            } else {
+                                slideDivData = slideDivData + '<div class="item">' +
+                                    '<img class="carImgHeight" src="' + currFileUrl + '" data-indexImg="' + (indexImgCount++) + '"></img>' +
+                                    '</div>';
+                            }
                         } else {
-                            slideDivData = slideDivData + '<div class="item">' +
-                                '<img class="carImgHeight" src="' + slideData[s1].imageUrls[s3] + '" data-indexImg="' + (indexImgCount++) + '"></img>' +
-                                '</div>';
+                            if (s3 == 0) {
+                                slideDivData = slideDivData + '<div class="item active">' +
+                                    '<img class="carImgHeight" src="' + slideData[s1].imageUrls[s3] + '" data-indexImg="' + (indexImgCount++) + '"></img>' +
+                                    '</div>';
+                            } else {
+                                slideDivData = slideDivData + '<div class="item">' +
+                                    '<img class="carImgHeight" src="' + slideData[s1].imageUrls[s3] + '" data-indexImg="' + (indexImgCount++) + '"></img>' +
+                                    '</div>';
+                            }
                         }
                     }
 
