@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/8a8cbaef-904b-4041-9713-d8515aa6fbae/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/xvisionserver21",
+    "appService.deploySubpath": "."
+}
