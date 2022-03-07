@@ -149,24 +149,24 @@ function sendgetrequest(imagePath,req,res){
 app.post('/lireq', multer({ storage: storage }).single('urld'), (req, res, next)=>{
 
    // Kush: save the session id and session data from the incoming request if it is present. 
-   console.log("session data: ",req.body.sessiondata)
-   if(req.body.sessiondata !== undefined && req.body.sessiondata !== null && req.body.sessiondata !== "")
-   {
-    let sessiondata = req.body.sessiondata
-    //console.log("session data: ",sessiondata)
-    const jsonobj = JSON.parse(req.body.sessiondata);
-    let sessionid = jsonobj.sessionID.split('@')
-    //console.log("sessionid: ",sessionid)
-    sessionid = sessionid[0].replace('\"','')
-    //console.log("replace sessionid: ",sessionid)
-    const file = './' + sessiondatapath + '/' + sessionid
-    //console.log(sessiondata)
-    //console.log(file)
-    fs.appendFile(file, sessiondata + os.EOL, function (err) {
-      if (err) throw err;
-      console.log('Saved!');
-    });
-   }
+  //  console.log("session data: ",req.body.sessiondata)
+  //  if(req.body.sessiondata !== undefined && req.body.sessiondata !== null && req.body.sessiondata !== "")
+  //  {
+  //   let sessiondata = req.body.sessiondata
+  //   //console.log("session data: ",sessiondata)
+  //   const jsonobj = JSON.parse(req.body.sessiondata);
+  //   let sessionid = jsonobj.sessionID.split('@')
+  //   //console.log("sessionid: ",sessionid)
+  //   sessionid = sessionid[0].replace('\"','')
+  //   //console.log("replace sessionid: ",sessionid)
+  //   const file = './' + sessiondatapath + '/' + sessionid
+  //   //console.log(sessiondata)
+  //   //console.log(file)
+  //   fs.appendFile(file, sessiondata + os.EOL, function (err) {
+  //     if (err) throw err;
+  //     console.log('Saved!');
+  //   });
+  //  }
 
    var imgurl = req.body.imgurl
    //console.log("--------->",imgurl)
