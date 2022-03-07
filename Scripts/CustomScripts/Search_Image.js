@@ -21,9 +21,12 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
             mainTableData: '',
             baseImagedata: '',
             serverHostedDetails: {
-                url: 'https://xvisionserver21.azurewebsites.net/lireq',
-                geturl: 'https://xvisionserver21.azurewebsites.net/sessionid',
-                getDefImagesUrl: 'https://xvisionserver21.azurewebsites.net/defaultImages',
+                // url: 'https://xvisionserver21.azurewebsites.net/lireq',
+                // geturl: 'https://xvisionserver21.azurewebsites.net/sessionid',
+                // getDefImagesUrl: 'https://xvisionserver21.azurewebsites.net/defaultImages',
+                url: 'http://localhost:3000/lireq',
+                geturl: 'http://localhost:3000/sessionid',
+                getDefImagesUrl: 'http://localhost:3000/defaultImages',
                 urlkey: 'urld',
                 imgUrlKey: 'imgurl',
                 cookiesKey: 'sessiondata'
@@ -67,9 +70,21 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 //check cookies
                 checkCookies();
 
-                pageDetails.pageFlagVal = getQueryString(pageDetails.pageFlag);
+                // pageDetails.pageFlagVal = getQueryString(pageDetails.pageFlag);
+
+                pageDetails.pageFlagVal = 'no';
 
                 pageDetails.hostedflagVal = getQueryString(pageDetails.hostedflag);
+
+                $(pageDetails.idDetails[0]).css("display", "block");
+                $(pageDetails.idDetails[1]).hide();
+
+                var getSlideSucc = getSlideShowData();
+
+                getSlideSucc.done(function () {
+                    $('.carousel').carousel();
+                    $('body').removeClass("loading");
+                });
 
 
                 if (pageDetails.pageFlagVal == 'yes') {
@@ -255,8 +270,8 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 if (getCookies('sessionID')[1] != undefined && getCookies('sessionID')[1] != null && getCookies('sessionID')[1] != '') {
 
                     //If cookies are present then verify captcha
-                    createCaptcha();
-                    $("#captcha_app_div").modal({ backdrop: 'static', keyboard: false });
+                    // createCaptcha();
+                    // $("#captcha_app_div").modal({ backdrop: 'static', keyboard: false });
 
                 } else {
                     $("#cookieModal").modal({ backdrop: 'static', keyboard: false });

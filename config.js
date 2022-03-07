@@ -40,6 +40,6 @@ requirejs.config({
         }
 
     },
-    waitSeconds: 7
+    waitSeconds: 15
 
 });
