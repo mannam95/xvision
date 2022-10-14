@@ -39,7 +39,8 @@ function checkresponse(data){
   return JSON.stringify(data).includes('topScores');
 }
 
-var httpurl = conf.protocol + "://" + conf.bserverhostip + ":" + conf.bserverportnumber 
+// var httpurl = conf.protocol + "://" + conf.bserverhostip + ":" + conf.bserverportnumber 
+var httpurl = conf.protocol + "://" + conf.bserverhostip
 
 const sessiondatapath = "sessiondata"
 
