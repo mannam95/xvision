@@ -236,6 +236,10 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 $.ajax({
                     url: pageDetails.serverHostedDetails.geturl,
                     type: 'GET',
+                    crossDomain: true,
+                    "headers": {
+                        "Access-Control-Allow-Origin":"*"
+                    },
                     // dataType: 'json', // added data type
                     success: function (res) {
                         console.log(res);
@@ -295,6 +299,10 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 $.ajax({
                     url: pageDetails.serverHostedDetails.getDefImagesUrl,
                     type: 'GET',
+                    crossDomain: true,
+                    "headers": {
+                        "Access-Control-Allow-Origin":"*"
+                    },
                     // dataType: 'json', // added data type
                     success: function (res) {
                         generateSlideShow(JSON.parse(res));
@@ -575,6 +583,10 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 $.ajax({
                     url: pageDetails.imageUrl,
                     type: 'HEAD',
+                    crossDomain: true,
+                    "headers": {
+                        "Access-Control-Allow-Origin":"*"
+                    },
                     error: function () {
                         $('#url_box').val('');
                         swal.fire({
@@ -1591,6 +1603,10 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                     $.ajax({
                         url: pageDetails.serverHostedDetails.url,
                         type: 'POST',
+                        crossDomain: true,
+                        headers: {
+                            "Access-Control-Allow-Origin":"*"
+                        },
                         data: formdata,
                         processData: false,
                         contentType: false,
