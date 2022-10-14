@@ -17,11 +17,11 @@ const xlsxFile = require('xlsx');
 // var httpurl = conf.protocol + "://" + conf.bserverhostip + ":" + conf.bserverportnumber 
 var httpurl = conf.protocol + "://" + conf.bserverhostip
 
-app.use(cors({
-  origin: httpurl,
-  credentials: true,            //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-}))
+// app.use(cors({
+//   origin: httpurl,
+//   credentials: true,            //access-control-allow-credentials:true
+//   optionSuccessStatus: 200,
+// }))
 
 //map the base image absolute path to proxy resultimages directory.
 //app.use('/resultimages', express.static(path.join(conf.baseimgdir)));
