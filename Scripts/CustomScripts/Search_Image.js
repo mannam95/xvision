@@ -68,7 +68,7 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
             try {
 
                 //check cookies
-                checkCookies();
+                // checkCookies();
 
                 // pageDetails.pageFlagVal = getQueryString(pageDetails.pageFlag);
 
