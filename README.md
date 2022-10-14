@@ -43,7 +43,7 @@ FrontEnd_Html5(Parent Folder)
 ### Online Usage:
 
 * As of now it's hosted in the following URL  
-[IRTEX](https://irtex.azurewebsites.net/).
+[IRTEX](https://irtex-ui.herokuapp.com/).
 * Can follow the same rules which are mentioned in offline usage.
 
 
@@ -54,11 +54,4 @@ FrontEnd_Html5(Parent Folder)
 ```
 ".XBM", ".TIF", ".PJP", ".PJPEG", ".JFIF", ".WEBP", ".ICO", ".TIFF", ".BMP", ".PNG", ".JPEG", ".SVGZ", ".JPG", ".GIF", ".SVG", "EXIF"
 ```
-
-## Authors
-
-* **Venkata Srinath Mannam** - *UI Developer*
-
-### Contributors
-* **Subhankar Patra** - *Contributed in visual explanation design part*
 
