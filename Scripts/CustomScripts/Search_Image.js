@@ -1,6 +1,8 @@
 define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6promise', 'zingchart', 'bootstrap', 'tensorflowjs', 'responseJson'], function ($, jqueryui, swal, datatables, datatables_net, es6promise, z_chart, b_strap, tfjs, respJs) {
     $(function () {
 
+        var hostname = '18.130.17.68:3000';
+
         // store all the variables as an object properties
         var pageDetails = {
             data: 'Testing',
@@ -24,9 +26,9 @@ define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6
                 // url: 'https://xvisionserver21.azurewebsites.net/lireq',
                 // geturl: 'https://xvisionserver21.azurewebsites.net/sessionid',
                 // getDefImagesUrl: 'https://xvisionserver21.azurewebsites.net/defaultImages',
-                url: 'http://localhost:3000/lireq',
-                geturl: 'http://localhost:3000/sessionid',
-                getDefImagesUrl: 'http://localhost:3000/defaultImages',
+                url: 'http://'+ hostname +'/lireq',
+                geturl: 'http://'+ hostname +'/sessionid',
+                getDefImagesUrl: 'http://'+ hostname +'/defaultImages',
                 urlkey: 'urld',
                 imgUrlKey: 'imgurl',
                 cookiesKey: 'sessiondata'
