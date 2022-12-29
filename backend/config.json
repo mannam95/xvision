@@ -1,5 +1,5 @@
 {
-    "bserverhostip" : "irtex-backend.herokuapp.com",
+    "bserverhostip" : "irtexbackend-production.up.railway.app",
     "bserverportnumber" : "3000",
     "protocol" : "https",
     "iserverhostip" : "irtex-backend.herokuapp.com",
