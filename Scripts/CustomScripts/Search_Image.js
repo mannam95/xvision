@@ -1,7 +1,7 @@
 define(['jquery', 'jqueryui', 'sweetalert', 'datatables', 'datatables.net', 'es6promise', 'zingchart', 'bootstrap', 'tensorflowjs', 'responseJson'], function ($, jqueryui, swal, datatables, datatables_net, es6promise, z_chart, b_strap, tfjs, respJs) {
     $(function () {
 
-        var hostname = 'irtex-backend.herokuapp.com';
+        var hostname = 'irtexbackend-production.up.railway.app';
 
         // store all the variables as an object properties
         var pageDetails = {
