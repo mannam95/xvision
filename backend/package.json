@@ -1,0 +1,27 @@
+{
+  "name": "irtex_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mannam95/IRTEX_Backend.git"
+  },
+  "author": "Srinath",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mannam95/IRTEX_Backend/issues"
+  },
+  "homepage": "https://github.com/mannam95/IRTEX_Backend#readme",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "express": "^4.17.1",
+    "multer": "^1.4.3",
+    "valid-url": "^1.0.9",
+    "xlsx": "^0.17.1"
+  }
+}
