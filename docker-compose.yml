@@ -1,0 +1,25 @@
+version: '3'
+services:
+    frontend:
+        image: angular-webapp
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile.dev
+        ports: 
+            - "4200:4200"
+        volumes:
+            - "./frontend:/angular"
+            - "ang_node_vol:/angular/node_modules"
+    backend:
+        image: backend-server
+        build:
+            context: ./backend
+            dockerfile: Dockerfile.dev
+        ports: 
+            - "3000:3000"
+        volumes:
+            - "./backend:/backend"
+            - "back_node_vol:/backend/back_modules"
+volumes:
+  ang_node_vol:
+  back_node_vol:
