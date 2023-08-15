@@ -1,0 +1,36 @@
+<div class="container-fluid" style="padding-top: 0px !important;justify-content: center;">
+    <div class="row row-flex search-container" style="justify-content: center;">
+        <div class="container" style="padding-top: 0;padding-bottom: 0;">
+            <div class="row">
+                <div class="col-sm-12 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+                    <div class="imageSearchDiv">
+                        <div class="formsDiv">
+                            <div>
+                                <label for="upload_box" id="formupload-button" style="cursor: pointer;"
+                                    (click)="formupload_box.click()" title="Upload an image"></label>
+                                <input id="formupload_box" #formupload_box type="file" name="image"
+                                    title="Upload an image" aria-label="Upload an image to search for" accept="Image/*">
+                            </div>
+                            <div>
+                                <div class="input-container">
+                                    <input class="image-url" id="url_box" name="url" maxlength="100000"
+                                        placeholder="Upload, Paste or Enter Image URL"
+                                        aria-label="Enter a link to an image to search for" type="text">
+                                </div>
+                                <input class="submit-button" id="SearchBtn" name="search_button" value="" type="submit">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="queryImageID" style="display: none; background-color: rgba(246, 249, 253, 1);">
+        <div class="container" style="width: 70%;margin-top: 0.2em;margin-bottom: 0.2em;">
+            <div class="row">
+                <div class="col-sm-3 col-xs-3 imgVerCenter" id="viewPartdiv"></div>
+                <div class="col-sm-9 col-xs-9" id="globalDivID" style="justify-content: center;"></div>
+            </div>
+        </div>
+    </div>
+</div>

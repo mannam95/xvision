@@ -1,0 +1,25 @@
+<div class="container carouselContainer">
+    <div class="row">
+        <h2 class="card-title">Explore the search with the following images!!</h2>
+    </div>
+    <div class="row" style="display: flex;">
+        <ng-container *ngFor="let slideList of dynamicSlides">
+            <div class="col-sm-3">
+                <mat-card class="slide-card" style="flex: 1 1 auto;">
+                    <mat-card-header>
+                        <mat-card-title>{{slideList.imagesHeader}}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <owl-carousel-o [options]="customOptions">
+                            <ng-container *ngFor="let slide of slideList.imagesConfig">
+                                <ng-template carouselSlide [id]="slide.id">
+                                    <img [routerLink]="['/results']" (click)="backendAPIService.getCurrentImageResults(slide.index, slide.name)" class="carouselImage" [src]="slide.src" [name]="slide.name" [alt]="slide.alt" [title]="slide.title">
+                                </ng-template>
+                            </ng-container>
+                        </owl-carousel-o>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </ng-container>
+    </div>
+</div>

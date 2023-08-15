@@ -1,0 +1,91 @@
+.search-container {
+    background-color: rgba(44, 113, 161, 1);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-right: -1em;
+}
+
+.search-container .imageSearchDiv {
+    z-index: 100;
+    position: relative;
+    color: #fff;
+}
+
+.search-container .imageSearchDiv .formsDiv {
+    position: relative;
+    overflow: hidden;
+}
+
+.search-container .imageSearchDiv #formupload-button {
+    display: block;
+    float: left;
+    width: 40px;
+    height: 40px;
+    margin: 0 10px 0 0;
+    background-color: #3572af;
+    background-position: -10px -10px;
+    background-repeat: no-repeat;
+    background-image: url(../../../assets/images/upload.png);
+    border: none;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.search-container .imageSearchDiv #formupload_box {
+    position: fixed;
+    top: -1000px;
+}
+
+.search-container .imageSearchDiv .input-container {
+    position: absolute;
+    left: 50px;
+    right: 38px;
+}
+
+.search-container .imageSearchDiv .image-url {
+    display: block;
+    float: left;
+    color: #333;
+    width: 100%;
+    overflow: hidden;
+    height: 40px;
+    padding: 10px;
+    margin: 0;
+    outline: 0;
+    border: none;
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+}
+
+.search-container .imageSearchDiv .submit-button {
+    display: block;
+    position: absolute;
+    right: 0;
+    background-color: #3572af;
+    background-position: -12px -10px;
+    background-repeat: no-repeat;
+    background-image: url(../../../assets/images/search.png);
+    min-width: 40px;
+    height: 40px;
+    margin: 0;
+    outline: 0;
+    border: none;
+    border-left: 1px solid #fff;
+    -webkit-border-radius: 0 3px 3px 0;
+    -moz-border-radius: 0 3px 3px 0;
+    border-radius: 0 3px 3px 0;
+    opacity: 1;
+}
+
+.imgVerCenter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.imageSearchDiv{
+    margin-left: 20em;
+    margin-right: -20em;
+}
