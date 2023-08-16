@@ -19,7 +19,7 @@ services:
             - "3000:3000"
         volumes:
             - "./backend:/backend"
-            - "back_node_vol:/backend/back_modules"
+            - "back_node_vol:/backend/node_modules"
 volumes:
   ang_node_vol:
   back_node_vol:

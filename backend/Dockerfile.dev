@@ -15,8 +15,13 @@ COPY package.json ./
 # install dependencies
 RUN npm install --force
 
+# Bundle app source
+COPY . ./
+
 # Export port 3000
 EXPOSE 3000
 
 # start app
-CMD ["ng", "serve", "--host", "0.0.0.0", "--poll", "2000"]
+CMD ["node", "server.js"]
+
+# CMD ["tail", "-f", "/dev/null"]
