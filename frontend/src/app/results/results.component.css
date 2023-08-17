@@ -27,3 +27,15 @@
   cursor: pointer !important;
   font-weight: bolder;
 }
+
+.mat-expansion-panel-header {
+  display: contents;
+}
+
+.mat-expansion-panel:not([class*=mat-elevation-z]) {
+  box-shadow: none;
+}
+
+::ng-deep .mat-expansion-panel-body {
+  padding: none !important;
+}

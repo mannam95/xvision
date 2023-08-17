@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { BackendAPIService } from '../service/backend-api.service'
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { IServerResults, ServerResults, Similarityarr, TopScore } from './interface/query_results_interface';
 import { MaterialModule } from '../sharedModule/material.module';
 import { MatTableDataSource } from '@angular/material/table';
@@ -13,8 +13,8 @@ import { MatSort } from '@angular/material/sort';
   templateUrl: './results.component.html',
   styleUrls: ['./results.component.css'],
   animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
+    trigger('expandCollapse', [
+      state('collapsed', style({height: '*'})),
       state('expanded', style({height: '*'})),
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
@@ -30,6 +30,8 @@ export class ResultsComponent implements OnInit {
   paginator!: MatPaginator;
   @ViewChild(MatSort)
   sort!: MatSort;
+
+  expandedRows: any[] = [];
   
 
   constructor(private backendAPIService: BackendAPIService) { 
@@ -60,9 +62,7 @@ export class ResultsComponent implements OnInit {
     return '/assets/images/resultImages/' + filename;
   }
 
-  onLocalExpBtnClick(row: any): void {
-  }
-
+  // Triggered when the user clicks on the Visual Explanation button
   onVisualExpBtnClick(row: any): void {
   }
 
