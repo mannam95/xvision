@@ -23,7 +23,7 @@ import { MatSort } from '@angular/material/sort';
 export class ResultsComponent implements OnInit {
 
   currentImageResults: IServerResults;
-  displayedColumns = ['id', 'result_image', 'progress', 'color'];
+  displayedColumns = ['id', 'result_image', 'local_exp', 'visual_exp'];
   dataSource: MatTableDataSource<Similarityarr>;
 
   @ViewChild(MatPaginator)
@@ -38,9 +38,6 @@ export class ResultsComponent implements OnInit {
     // console.log(this.reOrderData(JSON.parse(JSON.stringify(this.currentImageResults))));
     this.currentImageResults = this.updateServerResults(JSON.parse(JSON.stringify(this.currentImageResults)))
     console.log('Modified results:', this.currentImageResults);
-
-    const users: UserData[] = [];
-    for (let i = 1; i <= 100; i++) { users.push(createNewUser(i)); }
 
     // Assign the data to the data source for the table to render
     this.dataSource = new MatTableDataSource(this.currentImageResults.SemanticData.similarity_arr);
@@ -103,10 +100,6 @@ export class ResultsComponent implements OnInit {
   }
 
   // A method to extract the filename from the path
-  // getFileNameFromPath(path: string): string {
-  //   return path.split('\\').pop()!.split('#')[0].split('?')[0];
-  // }
-
   getFilenameFromPath(filePath: string): string {
     let filename: string;
   
@@ -243,32 +236,4 @@ export class ResultsComponent implements OnInit {
 
     return results;
   }
-}
-
-/** Builds and returns a new User. */
-function createNewUser(id: number): UserData {
-  const name =
-      NAMES[Math.round(Math.random() * (NAMES.length - 1))] + ' ' +
-      NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) + '.';
-
-  return {
-    id: id.toString(),
-    name: name,
-    progress: Math.round(Math.random() * 100).toString(),
-    color: COLORS[Math.round(Math.random() * (COLORS.length - 1))]
-  };
-}
-
-/** Constants used to fill up our data base. */
-const COLORS = ['maroon', 'red', 'orange', 'yellow', 'olive', 'green', 'purple',
-  'fuchsia', 'lime', 'teal', 'aqua', 'blue', 'navy', 'black', 'gray'];
-const NAMES = ['Maia', 'Asher', 'Olivia', 'Atticus', 'Amelia', 'Jack',
-  'Charlotte', 'Theodore', 'Isla', 'Oliver', 'Isabella', 'Jasper',
-  'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'];
-
-export interface UserData {
-  id: string;
-  name: string;
-  progress: string;
-  color: string;
 }

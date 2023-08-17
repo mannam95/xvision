@@ -17,7 +17,7 @@
     </ng-container>
 
     <!-- Local Explanation Column -->
-    <ng-container matColumnDef="progress">
+    <ng-container matColumnDef="local_exp">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Progress </mat-header-cell>
       <mat-cell *matCellDef="let row" style="flex: 30%; padding: 5px;">
         <button class="btn-cls" mat-button (click)="onLocalExpBtnClick(row)">Local Explaination</button>
@@ -25,7 +25,7 @@
     </ng-container>
 
     <!-- Visual Explanation Column -->
-    <ng-container matColumnDef="color">
+    <ng-container matColumnDef="visual_exp">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Color </mat-header-cell>
       <mat-cell *matCellDef="let row" [style.color]="row.color" style="flex: 20%;">
         <button class="btn-cls" mat-button (click)="onVisualExpBtnClick(row)">Visual Explaination</button>
