@@ -21,6 +21,9 @@ export interface Similarityarr {
     base_img: string;
     base_name_original: string;
     query_img: string;
+    base_img_file_name: string;
+    base_name_original_file_name: string;
+    query_img_file_name: string;
     sim_per_facet: Simperfacet[];
     similarity_for_obj: number;
     averageColorSimilarity: number;
@@ -66,7 +69,7 @@ interface QueryImgDetails {
     mainFeatures: MainFeatures;
 }
 
-interface TopScore {
+export interface TopScore {
     name: string;
     overallDistScore: number;
     backforegrounddistance: number;

@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BackendAPIService } from '../service/backend-api.service'
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { plainToClass, plainToInstance } from 'class-transformer';
-import { IServerResults, ServerResults, Similarityarr } from './interface/query_results_interface';
+import { IServerResults, ServerResults, Similarityarr, TopScore } from './interface/query_results_interface';
+import { MaterialModule } from '../sharedModule/material.module';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-results',
@@ -19,25 +23,58 @@ import { IServerResults, ServerResults, Similarityarr } from './interface/query_
 export class ResultsComponent implements OnInit {
 
   currentImageResults: IServerResults;
-  dataSource = ELEMENT_DATA;
-  columnsToDisplay = ['name', 'weight', 'symbol', 'position'];
-  expandedElement: PeriodicElement | null;
+  displayedColumns = ['id', 'result_image', 'progress', 'color'];
+  dataSource: MatTableDataSource<Similarityarr>;
+
+  @ViewChild(MatPaginator)
+  paginator!: MatPaginator;
+  @ViewChild(MatSort)
+  sort!: MatSort;
   
 
   constructor(private backendAPIService: BackendAPIService) { 
     this.currentImageResults = plainToInstance(ServerResults, [JSON.parse(JSON.stringify(this.backendAPIService.slideData))])[0];
-    this.expandedElement = null;
     console.log('Initial results:', this.currentImageResults);
     // console.log(this.reOrderData(JSON.parse(JSON.stringify(this.currentImageResults))));
     this.currentImageResults = this.updateServerResults(JSON.parse(JSON.stringify(this.currentImageResults)))
     console.log('Modified results:', this.currentImageResults);
+
+    const users: UserData[] = [];
+    for (let i = 1; i <= 100; i++) { users.push(createNewUser(i)); }
+
+    // Assign the data to the data source for the table to render
+    this.dataSource = new MatTableDataSource(this.currentImageResults.SemanticData.similarity_arr);
+  }
+
+  /**
+   * Set the paginator and sort after the view init since this component will
+   * be able to query its view for the initialized paginator and sort.
+   */
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   ngOnInit(): void {
   }
 
+  getImageUrl(filename: string): string {
+    // Return the URL or path to the image based on the filename
+    return '/assets/images/resultImages/' + filename;
+  }
+
+  onLocalExpBtnClick(row: any): void {
+  }
+
+  onVisualExpBtnClick(row: any): void {
+  }
+
+
+
   // A method to re-order the data from the server
   updateServerResults(results: IServerResults): IServerResults {
+
+    results = this.applyFileNameExtraction(JSON.parse(JSON.stringify(results)));
 
     results = this.calculateSimilarityScores(JSON.parse(JSON.stringify(results)));
 
@@ -46,7 +83,43 @@ export class ResultsComponent implements OnInit {
     // Now there might be some images with averageTotalSimilarity = 0, so we need to sort them based on overallDistScore
     results = this.sortByOverallDistScore(JSON.parse(JSON.stringify(results)));
 
+    // Also sort the overallDistScore in  data topScores
+    results.Data.topScores = this.sortArrayOverallDistScoreForTopScore(JSON.parse(JSON.stringify(results.Data.topScores)), false);
+
     return results;
+  }
+
+  // A method which applies wherever filenames are needed
+  applyFileNameExtraction(results: IServerResults): IServerResults {
+
+    // apply to SemanticData.similarity_arr
+    for (let i = 0; i < results.SemanticData.similarity_arr.length; i++) {
+      results.SemanticData.similarity_arr[i].base_img_file_name = this.getFilenameFromPath(results.SemanticData.similarity_arr[i].base_img);
+      results.SemanticData.similarity_arr[i].base_name_original_file_name = this.getFilenameFromPath(results.SemanticData.similarity_arr[i].base_name_original);
+      results.SemanticData.similarity_arr[i].query_img_file_name = this.getFilenameFromPath(results.SemanticData.similarity_arr[i].query_img);
+    }
+
+    return results;
+  }
+
+  // A method to extract the filename from the path
+  // getFileNameFromPath(path: string): string {
+  //   return path.split('\\').pop()!.split('#')[0].split('?')[0];
+  // }
+
+  getFilenameFromPath(filePath: string): string {
+    let filename: string;
+  
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      // For URLs
+      const segments = filePath.split('/');
+      filename = segments[segments.length - 1];
+    } else {
+      // For local file paths (not recommended for browser environment)
+      filename = filePath.split('\\').pop()!;
+    }
+  
+    return filename;
   }
 
   // A method to calculate the similarity scores
@@ -154,105 +227,48 @@ export class ResultsComponent implements OnInit {
 
     return results;
   }
+
+  // A method to sort the array based on overallDistScore
+  sortArrayOverallDistScoreForTopScore(results: TopScore[], ascdsc: boolean): TopScore[] {
+    let similarity_arr = results.sort((a, b) => {
+  
+      if (a.overallDistScore === b.overallDistScore) {
+        return 0;
+      }
+  
+      return (ascdsc ? 1 : -1) * (a.overallDistScore > b.overallDistScore ? 1 : -1);
+    });
+
+    results = similarity_arr;
+
+    return results;
+  }
 }
 
+/** Builds and returns a new User. */
+function createNewUser(id: number): UserData {
+  const name =
+      NAMES[Math.round(Math.random() * (NAMES.length - 1))] + ' ' +
+      NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) + '.';
 
-export interface PeriodicElement {
+  return {
+    id: id.toString(),
+    name: name,
+    progress: Math.round(Math.random() * 100).toString(),
+    color: COLORS[Math.round(Math.random() * (COLORS.length - 1))]
+  };
+}
+
+/** Constants used to fill up our data base. */
+const COLORS = ['maroon', 'red', 'orange', 'yellow', 'olive', 'green', 'purple',
+  'fuchsia', 'lime', 'teal', 'aqua', 'blue', 'navy', 'black', 'gray'];
+const NAMES = ['Maia', 'Asher', 'Olivia', 'Atticus', 'Amelia', 'Jack',
+  'Charlotte', 'Theodore', 'Isla', 'Oliver', 'Isabella', 'Jasper',
+  'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'];
+
+export interface UserData {
+  id: string;
   name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-  description: string;
+  progress: string;
+  color: string;
 }
-
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  {
-    position: 1,
-    name: 'Hydrogen',
-    weight: 1.0079,
-    symbol: 'H',
-    description: `Hydrogen is a chemical element with symbol H and atomic number 1. With a standard
-        atomic weight of 1.008, hydrogen is the lightest element on the periodic table.`,
-  },
-  {
-    position: 2,
-    name: 'Helium',
-    weight: 4.0026,
-    symbol: 'He',
-    description: `Helium is a chemical element with symbol He and atomic number 2. It is a
-        colorless, odorless, tasteless, non-toxic, inert, monatomic gas, the first in the noble gas
-        group in the periodic table. Its boiling point is the lowest among all the elements.`,
-  },
-  {
-    position: 3,
-    name: 'Lithium',
-    weight: 6.941,
-    symbol: 'Li',
-    description: `Lithium is a chemical element with symbol Li and atomic number 3. It is a soft,
-        silvery-white alkali metal. Under standard conditions, it is the lightest metal and the
-        lightest solid element.`,
-  },
-  {
-    position: 4,
-    name: 'Beryllium',
-    weight: 9.0122,
-    symbol: 'Be',
-    description: `Beryllium is a chemical element with symbol Be and atomic number 4. It is a
-        relatively rare element in the universe, usually occurring as a product of the spallation of
-        larger atomic nuclei that have collided with cosmic rays.`,
-  },
-  {
-    position: 5,
-    name: 'Boron',
-    weight: 10.811,
-    symbol: 'B',
-    description: `Boron is a chemical element with symbol B and atomic number 5. Produced entirely
-        by cosmic ray spallation and supernovae and not by stellar nucleosynthesis, it is a
-        low-abundance element in the Solar system and in the Earth's crust.`,
-  },
-  {
-    position: 6,
-    name: 'Carbon',
-    weight: 12.0107,
-    symbol: 'C',
-    description: `Carbon is a chemical element with symbol C and atomic number 6. It is nonmetallic
-        and tetravalent—making four electrons available to form covalent chemical bonds. It belongs
-        to group 14 of the periodic table.`,
-  },
-  {
-    position: 7,
-    name: 'Nitrogen',
-    weight: 14.0067,
-    symbol: 'N',
-    description: `Nitrogen is a chemical element with symbol N and atomic number 7. It was first
-        discovered and isolated by Scottish physician Daniel Rutherford in 1772.`,
-  },
-  {
-    position: 8,
-    name: 'Oxygen',
-    weight: 15.9994,
-    symbol: 'O',
-    description: `Oxygen is a chemical element with symbol O and atomic number 8. It is a member of
-         the chalcogen group on the periodic table, a highly reactive nonmetal, and an oxidizing
-         agent that readily forms oxides with most elements as well as with other compounds.`,
-  },
-  {
-    position: 9,
-    name: 'Fluorine',
-    weight: 18.9984,
-    symbol: 'F',
-    description: `Fluorine is a chemical element with symbol F and atomic number 9. It is the
-        lightest halogen and exists as a highly toxic pale yellow diatomic gas at standard
-        conditions.`,
-  },
-  {
-    position: 10,
-    name: 'Neon',
-    weight: 20.1797,
-    symbol: 'Ne',
-    description: `Neon is a chemical element with symbol Ne and atomic number 10. It is a noble gas.
-        Neon is a colorless, odorless, inert monatomic gas under standard conditions, with about
-        two-thirds the density of air.`,
-  },
-];
