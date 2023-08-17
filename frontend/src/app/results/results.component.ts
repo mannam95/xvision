@@ -7,7 +7,7 @@ import { MaterialModule } from '../sharedModule/material.module';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-// import * as tf from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs';
 
 @Component({
   selector: 'app-results',
@@ -298,9 +298,6 @@ export class ResultsComponent implements OnInit {
       extractShapeSemantic.push(rowData.mainFeatures.shapesemantic ?? [0]);
     }
 
-    console.log('extractColorSemanticData:', extractColorSemanticData);
-    console.log('extractShapeSemantic:', extractShapeSemantic);
-
     const semanticDataArray: any[] = [];
 
     // convert the array into an object with count
@@ -325,8 +322,9 @@ export class ResultsComponent implements OnInit {
     // Now do the same for colorSemanticData
     for (let i = 0; i < extractColorSemanticData.length; i++) {
       let uniqObjectsWithCount: any = {};
-      for (const objectValue of extractColorSemanticData[i]) {
-        uniqObjectsWithCount[objectValue] = uniqObjectsWithCount.hasOwnProperty(objectValue) ? uniqObjectsWithCount[objectValue] + 1 : 1;
+
+      for(let j=0; j<extractColorSemanticData[i].length; j++) {
+        uniqObjectsWithCount[this.colorConstants[j]] = extractColorSemanticData[i][j];
       }
 
       const mappedSemanticData = Object.keys(uniqObjectsWithCount).map(key => {
@@ -342,7 +340,7 @@ export class ResultsComponent implements OnInit {
     let featureVector = [];
 
     for (let i = 0; i < semanticDataArray.length; i++) {
-      const colorVec = semanticDataArray[i].colorSemanticData.map((value: any) => value['count']);
+      const colorVec = semanticDataArray[i].colorSemanticData.map((value: any) => Number(value['count']));
 
       const semanticsVec: number[] = []; // Initialize the array
 
@@ -352,14 +350,14 @@ export class ResultsComponent implements OnInit {
     featureVector = this.spliceVector(featureVector);
 
     // create the target vector
-    let targetVec = results.Data.topScores.map(item => item.overallDistScore);
+    let targetVec = results.Data.topScores.map(item => item.normlizedOverallDistScore);
 
-    console.log('featureVector:', featureVector);
+    const funcPromise = this.performLinearRegression(featureVector, targetVec);
 
-    console.log('targetVec:', targetVec);
-
-    console.log('mappedSemanticData:', semanticDataArray);
-
+    // once the promise is resolved, we can get the weights
+    funcPromise.then((trainedWeights: any) => {
+      console.log('trainedWeights:', trainedWeights);
+    });
   }
 
   // A method to splice the vector
@@ -392,63 +390,62 @@ export class ResultsComponent implements OnInit {
 
   // performs the linear regression
   // returns the weights
-  performLinearRegression(features: any, targets: any): any {
+  performLinearRegression(features: any, targets: any): Promise<any> {
 
-    // return new Promise((resolve, reject) => {
-    //   const epochs = 100;
-    //   const learningRate = 0.5;
-    //   const threshold = 0.5;
-    //   const optimizer = tf.train.sgd(learningRate);
+    return new Promise((resolve, reject) => {
+      const epochs = 2048;
+      const learningRate = 0.00000000001;
+      const threshold = 0.001;
+      const optimizer = tf.train.sgd(learningRate);
 
-    //   const xS = tf.tensor(features, [features.length, features[0].length]);
-    //   const yS = tf.tensor(targets, [targets.length, 1]);
+      const xS = tf.tensor(features, [features.length, features[0].length]);
+      const yS = tf.tensor(targets, [targets.length, 1]);
 
-    //   const model = tf.sequential();
+      const model = tf.sequential();
 
-    //   model.add(tf.layers.dense({
-    //     units: 1,
-    //     inputShape: [features[0].length],
-    //     weights: [tf.randomUniform([features[0].length, 1], 0, 0), tf.randomUniform([1], 0, 0)]
-    //   }));
+      model.add(tf.layers.dense({
+        units: 1,
+        inputShape: [features[0].length],
+        weights: [tf.randomUniform([features[0].length, 1], 0, 0), tf.randomUniform([1], 0, 0)]
+      }));
 
-    //   model.compile({
-    //     loss: 'meanSquaredError',
-    //     optimizer: optimizer
-    //   });
+      model.compile({
+        loss: 'meanSquaredError',
+        optimizer: optimizer
+      });
 
-    //   let previousLoss = 0, currentLoss = 0;
-    //   let modelPreviousWeights: any = null;
+      let previousLoss = 0, currentLoss = 0;
+      let modelPreviousWeights: any = null;
 
-    //   // now basically train the model until the loss is less than the threshold
-    //   let tfinterface = model.fit(xS, yS, {
-    //     epochs: epochs,
-    //     callbacks: [{
-    //       onEpochEnd: function onEpEnd(epoch: any, logs: any) {
-    //         console.log(`Epoch ${epoch}: loss = ${logs.loss}`)
-    //         currentLoss = logs.loss;
-    //         if (epoch === 0) {
-    //           previousLoss = currentLoss;
-    //           modelPreviousWeights = model.getWeights();
-    //         } else {
-    //           if (((previousLoss - currentLoss) < threshold) || previousLoss < currentLoss) {
-    //             model.stopTraining = true;
-    //           } else {
-    //             previousLoss = currentLoss;
-    //             modelPreviousWeights = model.getWeights();
-    //           }
-    //         }
-    //       }
-    //     }]
-    //   });
+      // now basically train the model until the loss is less than the threshold
+      let tfinterface = model.fit(xS, yS, {
+        epochs: epochs,
+        callbacks: [{
+          onEpochEnd: function onEpochEnd(epoch: any, logs: any) {
+            currentLoss = logs.loss;
+            if (epoch === 0) {
+              previousLoss = logs.loss;
+              modelPreviousWeights = model.getWeights()[0].dataSync();
+            } else {
+              if (((previousLoss - currentLoss) < threshold)) {
+                model.stopTraining = true;
+              } else {
+                previousLoss = currentLoss;
+                modelPreviousWeights = model.getWeights()[0].dataSync();
+              }
+            }
+          }
+        }]
+      });
 
-    //   // now resolve the promise, also clean up the memory.
-    //   tfinterface.then(function () {
-    //     model.dispose();
-    //     xS.dispose();
-    //     yS.dispose();
-    //     tf.disposeVariables();
-    //     resolve(modelPreviousWeights);
-    //   });
-    // });
+      // now resolve the promise, also clean up the memory.
+      tfinterface.then(function () {
+        model.dispose();
+        xS.dispose();
+        yS.dispose();
+        tf.disposeVariables();
+        resolve(modelPreviousWeights);
+      });
+    });
   }
 }
