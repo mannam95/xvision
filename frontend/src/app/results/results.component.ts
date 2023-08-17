@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BackendAPIService } from '../service/backend-api.service'
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { plainToClass, plainToInstance } from 'class-transformer';
-import { IServerResults, ServerResults } from './interface/query_results_interface';
+import { IServerResults, ServerResults, Similarityarr } from './interface/query_results_interface';
 
 @Component({
   selector: 'app-results',
@@ -29,7 +29,8 @@ export class ResultsComponent implements OnInit {
     this.expandedElement = null;
     console.log('Initial results:', this.currentImageResults);
     // console.log(this.reOrderData(JSON.parse(JSON.stringify(this.currentImageResults))));
-    console.log('Modified results:', this.updateServerResults(this.currentImageResults));
+    this.currentImageResults = this.updateServerResults(JSON.parse(JSON.stringify(this.currentImageResults)))
+    console.log('Modified results:', this.currentImageResults);
   }
 
   ngOnInit(): void {
@@ -38,12 +39,12 @@ export class ResultsComponent implements OnInit {
   // A method to re-order the data from the server
   updateServerResults(results: IServerResults): IServerResults {
 
-    results = this.calculateSimilarityScores(results);
+    results = this.calculateSimilarityScores(JSON.parse(JSON.stringify(results)));
 
-    results.SemanticData.similarity_arr = this.sortArrayByObj(results.SemanticData.similarity_arr, 'averageTotalSimilarity', true);
+    results = this.sortArrayTotalSimilarity(JSON.parse(JSON.stringify(results)), false);
 
     // Now there might be some images with averageTotalSimilarity = 0, so we need to sort them based on overallDistScore
-    results = this.sortByOverallDistScore(results);
+    results = this.sortByOverallDistScore(JSON.parse(JSON.stringify(results)));
 
     return results;
   }
@@ -93,29 +94,29 @@ export class ResultsComponent implements OnInit {
     return results;
   }
 
-  // A generic method to sort an array of objects based on a specific property value
-  sortArrayByObj<T>(inpArr: T[], objName: keyof T, ascdsc: boolean): T[] {
-    return inpArr.sort((a, b) => {
-      const aValue = Number(a[objName]);
-      const bValue = Number(b[objName]);
+  // A method to sort the array based on averageTotalSimilarity
+  sortArrayTotalSimilarity(results: IServerResults, ascdsc: boolean): IServerResults {
+    let similarity_arr = results.SemanticData.similarity_arr.sort((a, b) => {
   
-      if (aValue === bValue) {
+      if (a.averageTotalSimilarity === b.averageTotalSimilarity) {
         return 0;
       }
   
-      return (ascdsc ? 1 : -1) * (aValue > bValue ? 1 : -1);
+      return (ascdsc ? 1 : -1) * (a.averageTotalSimilarity > b.averageTotalSimilarity ? 1 : -1);
     });
+
+    results.SemanticData.similarity_arr = similarity_arr;
+
+    return results;
   }
 
   // A method to sort by overallDistScore
   sortByOverallDistScore(results: IServerResults): IServerResults {
 
-    let filteredResults: any;
-
-    const filteredIndex = results.SemanticData.similarity_arr.findIndex(item => item.averageTotalSimilarity === 0);
+    const filteredIndex = results.SemanticData.similarity_arr.findIndex(item => item.averageTotalSimilarity == 0);
 
     if (filteredIndex !== -1) {
-      filteredResults = results.SemanticData.similarity_arr.splice(filteredIndex);
+      let filteredResults: Similarityarr[] = results.SemanticData.similarity_arr.splice(filteredIndex);
       
       for (const item of filteredResults) {
         // Change to single forward slash
@@ -129,11 +130,27 @@ export class ResultsComponent implements OnInit {
           item.overallDistScore = matchingTopScore.overallDistScore;
         }
       }
+
+      filteredResults = this.sortArrayOverallDistScore(JSON.parse(JSON.stringify(filteredResults)), false);
+
+      results.SemanticData.similarity_arr = results.SemanticData.similarity_arr.concat(filteredResults);
     }
 
-    filteredResults = this.sortArrayByObj(filteredResults, 'overallDistScore', true);
+    return results;
+  }
 
-    results.SemanticData.similarity_arr = results.SemanticData.similarity_arr.concat(filteredResults);
+  // A method to sort the array based on overallDistScore
+  sortArrayOverallDistScore(results: Similarityarr[], ascdsc: boolean): Similarityarr[] {
+    let similarity_arr = results.sort((a, b) => {
+  
+      if (a.overallDistScore === b.overallDistScore) {
+        return 0;
+      }
+  
+      return (ascdsc ? 1 : -1) * (a.overallDistScore > b.overallDistScore ? 1 : -1);
+    });
+
+    results = similarity_arr;
 
     return results;
   }

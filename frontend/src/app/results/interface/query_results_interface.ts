@@ -17,7 +17,7 @@ interface SemanticData {
     similarity_arr: Similarityarr[];
 }
 
-interface Similarityarr {
+export interface Similarityarr {
     base_img: string;
     base_name_original: string;
     query_img: string;
