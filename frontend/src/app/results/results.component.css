@@ -1,6 +1,7 @@
 .example-container {
   width: 60%; /* Center the table with 10% margin on both sides */
   margin: 0 auto;
+  margin-top: 10px;
 }
 
 .mat-row {
