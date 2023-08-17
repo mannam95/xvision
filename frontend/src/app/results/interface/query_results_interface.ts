@@ -72,11 +72,17 @@ interface QueryImgDetails {
 export interface TopScore {
     name: string;
     overallDistScore: number;
+    normlizedOverallDistScore: number;
     backforegrounddistance: number;
+    normailzedBackforegrounddistance: number;
     colordistance: number;
+    normalizedColordistance: number;
     semanticcolordistance: number;
+    normalizedSemanticcolordistance: number;
     shapedistance: number;
+    normalizedShapedistance: number;
     HighLevelSemanticFeatureDistance: number;
+    normalizedHighLevelSemanticFeatureDistance: number;
     mainFeatures: MainFeatures;
 }
 
