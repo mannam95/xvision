@@ -10,7 +10,10 @@ export class BackendAPIService {
   // Holds thee current searched image results
   slideData:any;
 
-  constructor() { }
+  constructor() {
+    this.slideData = SlideData;
+    this.slideData = this.slideData['slideData'][0];
+  }
 
   // A method that will get the current selected image from the slide show and stores in a variable
   public getCurrentImageResults(index: number, imageName: string): void {

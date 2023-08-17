@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BackendAPIService } from '../service/backend-api.service'
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { IServerResults, ServerResults } from './interface/query_results_interface';
 
 @Component({
   selector: 'app-results',
@@ -16,21 +18,127 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 })
 export class ResultsComponent implements OnInit {
 
-  currentImageResults: any;
+  currentImageResults: IServerResults;
   dataSource = ELEMENT_DATA;
   columnsToDisplay = ['name', 'weight', 'symbol', 'position'];
   expandedElement: PeriodicElement | null;
+  
 
   constructor(private backendAPIService: BackendAPIService) { 
-    this.currentImageResults = this.backendAPIService.slideData;
+    this.currentImageResults = plainToInstance(ServerResults, [JSON.parse(JSON.stringify(this.backendAPIService.slideData))])[0];
     this.expandedElement = null;
-    console.log(this.currentImageResults)
+    console.log('Initial results:', this.currentImageResults);
+    // console.log(this.reOrderData(JSON.parse(JSON.stringify(this.currentImageResults))));
+    console.log('Modified results:', this.updateServerResults(this.currentImageResults));
   }
 
   ngOnInit(): void {
   }
 
+  // A method to re-order the data from the server
+  updateServerResults(results: IServerResults): IServerResults {
+
+    results = this.calculateSimilarityScores(results);
+
+    results.SemanticData.similarity_arr = this.sortArrayByObj(results.SemanticData.similarity_arr, 'averageTotalSimilarity', true);
+
+    // Now there might be some images with averageTotalSimilarity = 0, so we need to sort them based on overallDistScore
+    results = this.sortByOverallDistScore(results);
+
+    return results;
+  }
+
+  // A method to calculate the similarity scores
+  calculateSimilarityScores(results: IServerResults): IServerResults  {
+    // loop over through SemanticData.similarity_arr
+    for (let i = 0; i < results.SemanticData.similarity_arr.length; i++) {
+      // check similarity_for_obj != 0 and sim_per_facet.length > 0
+      if (results.SemanticData.similarity_arr[i].similarity_for_obj != 0 && results.SemanticData.similarity_arr[i].sim_per_facet.length > 0) {
+        let currentImgTotalColorSimilarity = 0;
+        let currentImgTotalShapeSimilarity = 0;
+
+        // loop over through sim_per_facet
+        for (let j = 0; j < results.SemanticData.similarity_arr[i].sim_per_facet.length; j++) {
+          // add sim_for_color to currentImgTotalColorSimilarity
+          currentImgTotalColorSimilarity += results.SemanticData.similarity_arr[i].sim_per_facet[j].sim_for_color;
+          
+          // add sim_for_shape to currentImgTotalShapeSimilarity
+          currentImgTotalShapeSimilarity += results.SemanticData.similarity_arr[i].sim_per_facet[j].sim_for_shape;
+        }
+
+        // calculate averageColorSimilarity
+        let currentImgAverageColorSimilarity = currentImgTotalColorSimilarity / results.SemanticData.similarity_arr[i].sim_per_facet.length;
+        
+        // calculate averageShapeSimilarity
+        let currentImgAverageShapeSimilarity = currentImgTotalShapeSimilarity / results.SemanticData.similarity_arr[i].sim_per_facet.length;
+
+        // add averageColorSimilarity to SemanticData.similarity_arr[i].averageColorSimilarity
+        results.SemanticData.similarity_arr[i].averageColorSimilarity = currentImgAverageColorSimilarity;
+        
+        // add averageShapeSimilarity to SemanticData.similarity_arr[i].averageShapeSimilarity
+        results.SemanticData.similarity_arr[i].averageShapeSimilarity = currentImgAverageShapeSimilarity;
+
+        // calculate averageTotalSimilarity, we calculate by assigning the following weights.
+        // color: 15%, shape: 15%, overall: 70%
+        results.SemanticData.similarity_arr[i].averageTotalSimilarity = (currentImgAverageColorSimilarity * 0.15) + (currentImgAverageShapeSimilarity * 0.15) + (results.SemanticData.similarity_arr[i].similarity_for_obj * 0.70);
+        
+
+      } else {
+        results.SemanticData.similarity_arr[i].averageColorSimilarity = 0;
+        results.SemanticData.similarity_arr[i].averageShapeSimilarity = 0;
+        results.SemanticData.similarity_arr[i].averageTotalSimilarity = 0;
+      }
+    }
+
+    return results;
+  }
+
+  // A generic method to sort an array of objects based on a specific property value
+  sortArrayByObj<T>(inpArr: T[], objName: keyof T, ascdsc: boolean): T[] {
+    return inpArr.sort((a, b) => {
+      const aValue = Number(a[objName]);
+      const bValue = Number(b[objName]);
+  
+      if (aValue === bValue) {
+        return 0;
+      }
+  
+      return (ascdsc ? 1 : -1) * (aValue > bValue ? 1 : -1);
+    });
+  }
+
+  // A method to sort by overallDistScore
+  sortByOverallDistScore(results: IServerResults): IServerResults {
+
+    let filteredResults: any;
+
+    const filteredIndex = results.SemanticData.similarity_arr.findIndex(item => item.averageTotalSimilarity === 0);
+
+    if (filteredIndex !== -1) {
+      filteredResults = results.SemanticData.similarity_arr.splice(filteredIndex);
+      
+      for (const item of filteredResults) {
+        // Change to single forward slash
+        const tempResImgName = item.base_name_original.split('\\').pop()!.split('#')[0].split('?')[0];
+
+        const matchingTopScore = results.Data.topScores.find(topScore =>
+          tempResImgName === topScore.name.split('/').pop()!.split('#')[0].split('?')[0]
+        );
+
+        if (matchingTopScore) {
+          item.overallDistScore = matchingTopScore.overallDistScore;
+        }
+      }
+    }
+
+    filteredResults = this.sortArrayByObj(filteredResults, 'overallDistScore', true);
+
+    results.SemanticData.similarity_arr = results.SemanticData.similarity_arr.concat(filteredResults);
+
+    return results;
+  }
 }
+
 
 export interface PeriodicElement {
   name: string;
@@ -40,19 +148,6 @@ export interface PeriodicElement {
   description: string;
 }
 
-export interface simPerFacet{
-  sim_for_color: number,
-  sim_for_shape: number,
-  similarity_of_obj_type: Array<any>;
-}
-
-export interface imageElement {
-  base_img: string;
-  base_name_original: string;
-  query_img: string;
-  sim_per_facet: Array<simPerFacet>;
-  similarity_for_obj: number;
-}
 
 const ELEMENT_DATA: PeriodicElement[] = [
   {
