@@ -32,9 +32,11 @@ export class ResultsComponent implements OnInit {
   sort!: MatSort;
 
   expandedRows: any[] = [];
+  queryImagePath: string = '';
   
 
-  constructor(private backendAPIService: BackendAPIService) { 
+  constructor(private backendAPIService: BackendAPIService) {
+    this.queryImagePath = this.backendAPIService.queryImagePath;
     this.currentImageResults = plainToInstance(ServerResults, [JSON.parse(JSON.stringify(this.backendAPIService.slideData))])[0];
     console.log('Initial results:', this.currentImageResults);
     // console.log(this.reOrderData(JSON.parse(JSON.stringify(this.currentImageResults))));
