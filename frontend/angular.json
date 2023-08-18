@@ -110,5 +110,7 @@
       }
     }
   },
-  "defaultProject": "IRTEX-UI"
+  "cli": {
+    "analytics": false
+  }
 }

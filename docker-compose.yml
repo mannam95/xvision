@@ -1,7 +1,7 @@
 version: '3'
 services:
-    frontend:
-        image: angular-webapp
+    xvision-frontend:
+        image: xvision-ui
         build:
             context: ./frontend
             dockerfile: Dockerfile.dev
@@ -10,8 +10,8 @@ services:
         volumes:
             - "./frontend:/angular"
             - "ang_node_vol:/angular/node_modules"
-    backend:
-        image: backend-server
+    xvision-backend:
+        image: xvision-api
         build:
             context: ./backend
             dockerfile: Dockerfile.dev

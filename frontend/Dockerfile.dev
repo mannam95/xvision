@@ -1,5 +1,5 @@
 # Get Alpine Linux
-FROM node:16.10.0-alpine AS node
+FROM node:16.14.0-alpine AS node
 
 # Install bash, sudo, and git
 RUN apk add bash \
@@ -10,10 +10,10 @@ RUN apk add bash \
 WORKDIR /angular
 
 # copy package.json
-COPY package.json ./
+COPY package*.json ./
 
 # Install Angular CLI
-RUN npm install -g @angular/cli@14.2.0
+RUN npm install -g @angular/cli@14.2.12
 
 # install dependencies
 RUN npm install --force
