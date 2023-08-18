@@ -1,15 +1,13 @@
-<div class="row" id="queryImageID" style="background-color: rgb(246, 249, 253);">
+<div class="row" style="background-color: rgb(246, 249, 253);margin-top: -11px;">
   <div class="container" style="width: 70%;margin-top: 0.2em;margin-bottom: 0.2em;">
     <div class="row">
       <div class="col-sm-5 col-xs-5 imgVerCenter" id="viewPartdiv">
-        <img
-          style="max-height:100%;max-width:100%;margin:auto;" id="previewImgID"
-          [src]="queryImagePath">
-        </div>
-      <div class="col-sm-7 col-xs-7" id="globalDivID" style="justify-content: center;">
+        <img style="max-height:100%;max-width:100%;margin:auto;" [src]="queryImagePath">
+      </div>
+      <div class="col-sm-7 col-xs-7" style="justify-content: center;">
         <div>
           <h1>Global Explanation</h1>
-          <h2>60 results</h2>
+          <h2>{{currentImageResults.SemanticData.similarity_arr.length}} results</h2>
           <!-- <h3>Search took 0.99 seconds for: <strong>2007_000032.jpg</strong></h3> -->
           <h4 style="padding-top: 10px;">
             <b>
@@ -18,9 +16,8 @@
             </b>
           </h4>
           <ul style="width:fit-content;" class="list-group">
-            <li class="list-group-item">In Features: High_level_semantic_feature &gt; Background_foreground &gt; Color
-              &gt; Shape </li>
-            <li class="list-group-item">In Colors: Navy, Maroon are dominant.</li>
+            <li class="list-group-item">In Features: {{ capitalizeAndJoinItems(highLevelFeaturesImportance, ' > ') }} </li>
+            <li class="list-group-item">In Colors: {{ capitalizeAndJoinItems(colorsImportance, ', ') }} are dominant.</li>
           </ul>
         </div>
       </div>

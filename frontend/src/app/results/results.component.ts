@@ -39,15 +39,17 @@ export class ResultsComponent implements OnInit {
   semanticsConstants = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor'];
   modifiedColorConstants: any[] = [];
   modifiedSemanticsConstants: any[] = [];
+  colorsImportance: string[] = [];
+  semanticsImportance: string[] = [];
+  highLevelFeaturesImportance: string[] = [];
 
 
   constructor(private backendAPIService: BackendAPIService) {
     this.queryImagePath = this.backendAPIService.queryImagePath;
     this.currentImageResults = plainToInstance(ServerResults, [JSON.parse(JSON.stringify(this.backendAPIService.slideData))])[0];
-    console.log('Initial results:', this.currentImageResults);
-    // console.log(this.reOrderData(JSON.parse(JSON.stringify(this.currentImageResults))));
+    // console.log('Initial results:', this.currentImageResults);
     this.currentImageResults = this.updateServerResults(JSON.parse(JSON.stringify(this.currentImageResults)))
-    console.log('Modified results:', this.currentImageResults);
+    // console.log('Modified results:', this.currentImageResults);
 
     // Prepare the data for the global-explanations
     this.prepareDataForGlobalExplanations(JSON.parse(JSON.stringify(this.currentImageResults)));
@@ -323,7 +325,7 @@ export class ResultsComponent implements OnInit {
     for (let i = 0; i < extractColorSemanticData.length; i++) {
       let uniqObjectsWithCount: any = {};
 
-      for(let j=0; j<extractColorSemanticData[i].length; j++) {
+      for (let j = 0; j < extractColorSemanticData[i].length; j++) {
         uniqObjectsWithCount[this.colorConstants[j]] = extractColorSemanticData[i][j];
       }
 
@@ -356,19 +358,21 @@ export class ResultsComponent implements OnInit {
 
     // once the promise is resolved, we can get the weights
     funcPromise.then((trainedWeights: any) => {
-      console.log('trainedWeights:', trainedWeights);
+      // console.log('trainedWeights:', trainedWeights);
+
+      this.calculateFeatureImportance(trainedWeights, results);
     });
   }
 
   // A method to splice the vector
   spliceVector(resultVector: any): any {
     // Find the maximum column length
-    const maxColumnLength = Math.max(...resultVector.map((row:any) => row.length));
+    const maxColumnLength = Math.max(...resultVector.map((row: any) => row.length));
 
     // Find columns with all zeros
     const zeroColumnsIndex: number[] = [];
     for (let colIndex = 0; colIndex < maxColumnLength; colIndex++) {
-      const isZeroColumn = resultVector.every((row:any) => row[colIndex] === 0);
+      const isZeroColumn = resultVector.every((row: any) => row[colIndex] === 0);
       if (isZeroColumn) {
         zeroColumnsIndex.push(colIndex);
       }
@@ -448,4 +452,75 @@ export class ResultsComponent implements OnInit {
       });
     });
   }
+
+  // Now it's time to calculate the importance of each feature by using the weights
+  calculateFeatureImportance(weights: any, results: IServerResults): any {
+    const numbers = [5, 2, 8, 2, 10, 8, 1];
+    let colorImportantFeatureWeights = this.getUniqueMinValuesWithIndexes(weights);
+
+    const importantColors: string[] = [];
+
+    for (let i = 0; i < colorImportantFeatureWeights.length; i++) {
+      importantColors.push(...colorImportantFeatureWeights[i].colorNames);
+    }
+
+    this.colorsImportance = importantColors;
+
+    // Same thing for the semantics as well.
+    let splitSemanticWeights = weights.slice(this.modifiedColorConstants.length);
+
+    let importantSemantics: string[] = [];
+
+    //check if the array is empty
+    if (splitSemanticWeights.length != 0) {
+      let semanticImportantFeatureWeights = this.getUniqueMinValuesWithIndexes(splitSemanticWeights);
+
+      for (let i = 0; i < semanticImportantFeatureWeights.length; i++) {
+        importantSemantics.push(...semanticImportantFeatureWeights[i].colorNames);
+      }
+    }
+
+    this.semanticsImportance = importantSemantics;
+
+    // Now calculate the high-level features importance
+    const highFeatureNames = results.Data.classification_names;
+    const highFeatureWeights = results.Data.classification_result;
+
+    // Sort array b in ascending order
+    const sortedHighFeaturesIndices = highFeatureWeights.map((_, index) => index).sort((i, j) => highFeatureWeights[i] - highFeatureWeights[j]);
+
+    this.highLevelFeaturesImportance = sortedHighFeaturesIndices.map(index => highFeatureNames[index]);
+  }
+
+  // A method to get the unique min values with indexes
+  getUniqueMinValuesWithIndexes(arr: number[]): { value: number, indexes: number[], colorNames: string[], }[] {
+    const uniqueSortedArray = [...new Set(arr)].sort((a, b) => a - b);
+    const result: { value: number, indexes: number[], colorNames: string[] }[] = [];
+
+    for (const value of uniqueSortedArray) {
+      const indexes: number[] = [];
+      const colorNames: string[] = [];
+
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === value) {
+          indexes.push(i);
+          colorNames.push(this.modifiedColorConstants[i]);
+        }
+      }
+
+      result.push({ value, indexes, colorNames });
+
+      if (result.length === 2) {
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  // A method that capitalizes the first letter of each word and joins them by ,
+  capitalizeAndJoinItems(items: string[], delimeter: string): string {
+    return items.map(item => item.charAt(0).toUpperCase() + item.slice(1)).join(delimeter);
+  }
+
 }
