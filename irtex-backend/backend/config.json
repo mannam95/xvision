@@ -1,5 +1,5 @@
 {
-    "bserverhostip" : "irtexbackend-production.up.railway.app",
+    "bserverhostip" : "xvision-backend.azurewebsites.net",
     "bserverportnumber" : "3000",
     "protocol" : "https",
     "iserverhostip" : "irtex-backend.herokuapp.com",
